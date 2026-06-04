@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { getContainedRelativePath, getPathParts, getRelativePath } from '../paths';
+import { getContainedRelativePath, getPathParts, getRelativePath, isPathWithinOrEqual, isSamePath } from '../paths';
 
 describe('path helpers', () => {
 	it('parses POSIX paths', () => {
@@ -46,5 +46,14 @@ describe('path helpers', () => {
 		assert.equal(getContainedRelativePath('C:\\workspace', 'C:\\workspace\\src\\index.ts'), 'src\\index.ts');
 		assert.equal(getContainedRelativePath('/workspace', '/workspace-other/index.ts'), undefined);
 		assert.equal(getContainedRelativePath('/workspace', '/workspace/..file'), '..file');
+	});
+
+	it('checks containment without rejecting normal dot-prefixed names', () => {
+		assert.equal(isPathWithinOrEqual('/workspace', '/workspace'), true);
+		assert.equal(isPathWithinOrEqual('/workspace', '/workspace/..cache/src'), true);
+		assert.equal(isPathWithinOrEqual('/workspace', '/workspace-other/src'), false);
+		assert.equal(isPathWithinOrEqual('C:\\Workspace', 'c:\\workspace\\src'), true);
+		assert.equal(isSamePath('C:\\Workspace', 'c:\\workspace'), true);
+		assert.equal(isSamePath('/Workspace', '/workspace'), false);
 	});
 });

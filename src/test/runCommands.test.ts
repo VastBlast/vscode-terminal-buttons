@@ -215,7 +215,7 @@ describe('run command resolution', () => {
 			isPowerShell: true,
 			isWindowsTerminal: true,
 			tools: { cmd: 'cmd' },
-		}), {}), 'cmd /c ${runFile}');
+		}), {}), '& ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: 'C:\\workspace\\script.cmd',

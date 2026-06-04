@@ -89,7 +89,7 @@ function getDefaultCommand(target: RunCommandTarget): string | undefined {
 				return undefined;
 			}
 
-			return target.isPowerShell ? 'cmd /c ${runFile}' : '${runFile}';
+			return target.isPowerShell ? '& ${runFile}' : '${runFile}';
 		case '.fish':
 			return target.tools.fish ? `${target.tools.fish} \${runFile}` : undefined;
 		case '.go':

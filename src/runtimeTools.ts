@@ -2,7 +2,7 @@ import { constants as fsConstants } from 'fs';
 import { access } from 'fs/promises';
 import { execFile, type ExecFileOptions } from 'child_process';
 import { promisify } from 'util';
-import { getPathApi, getPathParts } from './paths';
+import { getPathApi, getPathParts, isPathWithinOrEqual, isSamePath } from './paths';
 import { executablePathCommand, type ShellContext } from './shell';
 
 export type ToolName =
@@ -247,7 +247,7 @@ function getConfiguredTool(tool: ToolName, toolCommands: Record<string, string>)
 	return entry?.[1].trim();
 }
 
-function getSearchDirectories(cwd: string, workspaceFolder?: string) {
+export function getSearchDirectories(cwd: string, workspaceFolder?: string) {
 	if (!workspaceFolder) {
 		return [cwd];
 	}
@@ -260,28 +260,23 @@ function getSearchDirectories(cwd: string, workspaceFolder?: string) {
 	while (true) {
 		directories.push(current);
 
-		if (pathApi.resolve(current) === stopAt) {
+		if (isSamePath(current, stopAt)) {
 			break;
 		}
 
 		const parent = pathApi.dirname(current);
-		if (parent === current || !isWithinOrEqual(parent, stopAt, pathApi)) {
+		if (parent === current || !isPathWithinOrEqual(stopAt, parent)) {
 			break;
 		}
 
 		current = parent;
 	}
 
-	if (!directories.some(directory => pathApi.resolve(directory) === stopAt)) {
+	if (!directories.some(directory => isSamePath(directory, stopAt))) {
 		directories.push(workspaceFolder);
 	}
 
-	return [...new Set(directories)];
-}
-
-function isWithinOrEqual(directory: string, parent: string, pathApi: ReturnType<typeof getPathApi>) {
-	const relative = pathApi.relative(parent, directory);
-	return relative === '' || Boolean(relative) && !relative.startsWith('..') && !pathApi.isAbsolute(relative);
+	return uniqueDirectories(directories);
 }
 
 function formatConfiguredTool(command: string, shellContext: ShellContext) {
@@ -304,4 +299,16 @@ function localBinFileNames(tool: ToolName, shellContext: ShellContext) {
 	}
 
 	return [`${tool}.cmd`, `${tool}.exe`, tool];
+}
+
+function uniqueDirectories(directories: string[]) {
+	const unique: string[] = [];
+
+	for (const directory of directories) {
+		if (!unique.some(existing => isSamePath(existing, directory))) {
+			unique.push(directory);
+		}
+	}
+
+	return unique;
 }

@@ -3,7 +3,7 @@ import { mkdir, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { describe, it } from 'node:test';
-import { RuntimeDetector, getToolCandidates } from '../runtimeTools';
+import { RuntimeDetector, getSearchDirectories, getToolCandidates } from '../runtimeTools';
 import { getShellContext } from '../shell';
 
 describe('runtime tool detection', () => {
@@ -203,6 +203,14 @@ describe('runtime tool detection', () => {
 		});
 
 		assert.equal(calls.some(call => call.file === 'wsl.exe' && call.args.slice(0, 2).join(' ') === '-d Ubuntu-24.04'), true);
+	});
+
+	it('walks Windows workspace directories without duplicate case variants', () => {
+		assert.deepEqual(getSearchDirectories('C:\\Workspace\\..cache\\src', 'c:\\workspace'), [
+			'C:\\Workspace\\..cache\\src',
+			'C:\\Workspace\\..cache',
+			'C:\\Workspace',
+		]);
 	});
 });
 

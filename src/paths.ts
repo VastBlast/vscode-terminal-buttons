@@ -14,21 +14,39 @@ export function getPathParts(fileSystemPath: string) {
 }
 
 export function getRelativePath(from: string, to: string) {
-	const pathApi = usesWindowsSeparators(from) || usesWindowsSeparators(to) ? path.win32 : path.posix;
+	const pathApi = getPathApiForPaths(from, to);
 	return pathApi.relative(from, to) || pathApi.basename(to);
 }
 
 export function getContainedRelativePath(from: string, to: string) {
-	const pathApi = usesWindowsSeparators(from) || usesWindowsSeparators(to) ? path.win32 : path.posix;
+	const pathApi = getPathApiForPaths(from, to);
 	const relative = pathApi.relative(from, to);
 
-	return relative && !pathApi.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${pathApi.sep}`)
+	return relative && isContainedRelativePath(relative, pathApi)
 		? relative
 		: undefined;
 }
 
+export function isPathWithinOrEqual(parent: string, child: string) {
+	const pathApi = getPathApiForPaths(parent, child);
+	const relative = pathApi.relative(parent, child);
+	return relative === '' || isContainedRelativePath(relative, pathApi);
+}
+
+export function isSamePath(left: string, right: string) {
+	return getPathApiForPaths(left, right).relative(left, right) === '';
+}
+
 export function getPathApi(fileSystemPath: string) {
 	return usesWindowsSeparators(fileSystemPath) ? path.win32 : path.posix;
+}
+
+function getPathApiForPaths(left: string, right: string) {
+	return usesWindowsSeparators(left) || usesWindowsSeparators(right) ? path.win32 : path.posix;
+}
+
+function isContainedRelativePath(relativePath: string, pathApi: typeof path.posix | typeof path.win32) {
+	return !pathApi.isAbsolute(relativePath) && relativePath !== '..' && !relativePath.startsWith(`..${pathApi.sep}`);
 }
 
 function usesWindowsSeparators(fileSystemPath: string): boolean {
