@@ -2,7 +2,7 @@
   "name": "vastblast-simple-terminal-controls",
   "displayName": "Simple Terminal Controls",
   "description": "Status bar controls for common terminal workflows in VS Code.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "VastBlast",
   "license": "MIT",
   "icon": "resources/icon.png",
