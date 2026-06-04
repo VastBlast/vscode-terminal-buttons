@@ -1,4 +1,4 @@
-# Terminal Buttons
+# Simple Terminal Controls
 
 Three small VS Code buttons for terminal work:
 
@@ -23,11 +23,11 @@ Runtime detection is lazy. Nothing is probed at startup; PATH lookups are cached
 
 ## Custom Commands
 
-Set `terminalButtons.runCommands` in user or workspace settings. Keys can be a basename, extension, `*.extension`, extension without the dot, VS Code language id, `folder`, or `default`.
+Set `simpleTerminalControls.runCommands` in user or workspace settings. Keys can be a basename, extension, `*.extension`, extension without the dot, VS Code language id, `folder`, or `default`.
 
 ```json
 {
-  "terminalButtons.runCommands": {
+  "simpleTerminalControls.runCommands": {
     "vitest.config.ts": "vitest --config ${file}",
     ".ts": "tsx --env-file=.env ${file}",
     "py": "uv run ${file}",
@@ -46,26 +46,26 @@ Template variables:
 
 ## Settings
 
-- `terminalButtons.preferActiveTerminal`: use the active terminal when available. Default: `true`.
-- `terminalButtons.stopBehavior`: `restart`, `interrupt`, or `dispose`. Default: `restart`.
-- `terminalButtons.statusBarPriority`: status bar priority for the button group. Default: `10`; lower values place right-aligned items farther right.
-- `terminalButtons.colors`: status bar foreground colors for `run`, `stop`, and `cd`.
-- `terminalButtons.pathStyle`: `auto`, `native`, or `wsl`. Default: `auto`.
-- `terminalButtons.enableDefaultRunCommands`: enable built-in run defaults. Default: `true`.
-- `terminalButtons.autoDetectRuntimes`: enable lazy PATH runtime detection. Default: `true`.
-- `terminalButtons.terminalName`: dedicated terminal name. Default: `Terminal Buttons`.
-- `terminalButtons.tools`: override detected runtime commands or executable paths.
+- `simpleTerminalControls.preferActiveTerminal`: use the active terminal when available. Default: `true`.
+- `simpleTerminalControls.stopBehavior`: `restart`, `interrupt`, or `dispose`. Default: `restart`.
+- `simpleTerminalControls.statusBarPriority`: status bar priority for the button group. Default: `10`; lower values place right-aligned items farther right.
+- `simpleTerminalControls.colors`: status bar foreground colors for `run`, `stop`, and `cd`.
+- `simpleTerminalControls.pathStyle`: `auto`, `native`, or `wsl`. Default: `auto`.
+- `simpleTerminalControls.enableDefaultRunCommands`: enable built-in run defaults. Default: `true`.
+- `simpleTerminalControls.autoDetectRuntimes`: enable lazy PATH runtime detection. Default: `true`.
+- `simpleTerminalControls.terminalName`: dedicated terminal name. Default: `Simple Terminal Controls`.
+- `simpleTerminalControls.tools`: override detected runtime commands or executable paths.
 
 Example tool overrides:
 
 ```json
 {
-  "terminalButtons.colors": {
+  "simpleTerminalControls.colors": {
     "run": "#00FF66",
     "stop": "#FF3B30",
     "cd": "#00D7FF"
   },
-  "terminalButtons.tools": {
+  "simpleTerminalControls.tools": {
     "tsx": "pnpm exec tsx",
     "python": "uv run python",
     "pwsh": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
@@ -77,4 +77,4 @@ Example tool overrides:
 
 Remote WSL paths are already Linux paths and are left unchanged. In local Windows sessions, `pathStyle: auto` uses VS Code's detected terminal shell, shell-integration cwd, and WSL-like profiles to convert paths such as `C:\Users\me\project` to `/mnt/c/Users/me/project`.
 
-If a terminal was launched as `cmd` or PowerShell and then entered WSL by running `wsl`, auto mode works when VS Code reports the live terminal shell as `wsl`. If VS Code still reports the original shell, run `Terminal Buttons: Set Active Terminal Path Mode` and choose `WSL` for that terminal. Choose `Auto` to return to normal detection.
+If a terminal was launched as `cmd` or PowerShell and then entered WSL by running `wsl`, auto mode works when VS Code reports the live terminal shell as `wsl`. If VS Code still reports the original shell, run `Simple Terminal Controls: Set Terminal Path Mode` and choose `WSL` for that terminal. Choose `Auto` to return to normal detection.

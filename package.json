@@ -1,10 +1,11 @@
 {
-  "name": "terminal-buttons",
-  "displayName": "Terminal Buttons",
-  "description": "Small status bar buttons for running files, stopping terminal work, and changing directories.",
-  "version": "0.1.0",
+  "name": "vastblast-simple-terminal-controls",
+  "displayName": "Simple Terminal Controls",
+  "description": "Status bar controls for common terminal workflows in VS Code.",
+  "version": "0.1.3",
   "publisher": "VastBlast",
   "license": "MIT",
+  "icon": "resources/icon.png",
   "homepage": "https://github.com/VastBlast/vscode-terminal-buttons#readme",
   "bugs": {
     "url": "https://github.com/VastBlast/vscode-terminal-buttons/issues"
@@ -19,10 +20,7 @@
   "keywords": [
     "terminal",
     "status-bar",
-    "run",
-    "wsl",
-    "typescript",
-    "tsx"
+    "files"
   ],
   "galleryBanner": {
     "color": "#111827",
@@ -41,83 +39,83 @@
   "contributes": {
     "commands": [
       {
-        "command": "terminal-buttons.run",
-        "title": "Terminal Buttons: Run",
+        "command": "simple-terminal-controls.run",
+        "title": "Simple Terminal Controls: Run",
         "icon": "$(play)"
       },
       {
-        "command": "terminal-buttons.stop",
-        "title": "Terminal Buttons: Stop",
+        "command": "simple-terminal-controls.stop",
+        "title": "Simple Terminal Controls: Reset",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "terminal-buttons.cd",
-        "title": "Terminal Buttons: Change Directory",
+        "command": "simple-terminal-controls.cd",
+        "title": "Simple Terminal Controls: Change Directory",
         "icon": "$(terminal)"
       },
       {
-        "command": "terminal-buttons.setTerminalPathStyle",
-        "title": "Terminal Buttons: Set Active Terminal Path Mode",
+        "command": "simple-terminal-controls.setTerminalPathStyle",
+        "title": "Simple Terminal Controls: Set Terminal Path Mode",
         "icon": "$(settings-gear)"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "terminal-buttons.run",
-          "group": "terminalButtons@1"
+          "command": "simple-terminal-controls.run",
+          "group": "simpleTerminalControls@1"
         },
         {
-          "command": "terminal-buttons.cd",
-          "group": "terminalButtons@2"
+          "command": "simple-terminal-controls.cd",
+          "group": "simpleTerminalControls@2"
         }
       ],
       "editor/context": [
         {
-          "command": "terminal-buttons.run",
+          "command": "simple-terminal-controls.run",
           "group": "navigation@20"
         },
         {
-          "command": "terminal-buttons.cd",
+          "command": "simple-terminal-controls.cd",
           "group": "navigation@21"
         }
       ],
       "editor/title": [
         {
-          "command": "terminal-buttons.run",
+          "command": "simple-terminal-controls.run",
           "group": "navigation@20"
         },
         {
-          "command": "terminal-buttons.cd",
+          "command": "simple-terminal-controls.cd",
           "group": "navigation@21"
         }
       ],
       "terminal/title/context": [
         {
-          "command": "terminal-buttons.setTerminalPathStyle",
-          "group": "terminalButtons@1"
+          "command": "simple-terminal-controls.setTerminalPathStyle",
+          "group": "simpleTerminalControls@1"
         }
       ]
     },
     "configuration": {
-      "title": "Terminal Buttons",
+      "title": "Simple Terminal Controls",
       "properties": {
-        "terminalButtons.preferActiveTerminal": {
+        "simpleTerminalControls.preferActiveTerminal": {
           "type": "boolean",
           "default": true,
-          "description": "Use the active terminal when one exists. When disabled, commands use a dedicated Terminal Buttons terminal."
+          "description": "Use the active terminal when one exists. When disabled, commands use a dedicated Simple Terminal Controls terminal."
         },
-        "terminalButtons.enableDefaultRunCommands": {
+        "simpleTerminalControls.enableDefaultRunCommands": {
           "type": "boolean",
           "default": true,
-          "description": "Enable built-in single-file run commands. Disable this when you want terminalButtons.runCommands to be the only source of run behavior."
+          "description": "Enable built-in single-file run commands. Disable this when you want simpleTerminalControls.runCommands to be the only source of run behavior."
         },
-        "terminalButtons.autoDetectRuntimes": {
+        "simpleTerminalControls.autoDetectRuntimes": {
           "type": "boolean",
           "default": true,
           "description": "Detect relevant runtime commands lazily and cache the result. Project-local TypeScript runners are checked before PATH commands."
         },
-        "terminalButtons.stopBehavior": {
+        "simpleTerminalControls.stopBehavior": {
           "type": "string",
           "enum": [
             "restart",
@@ -125,19 +123,19 @@
             "dispose"
           ],
           "default": "restart",
-          "description": "How the Stop button stops terminal work. Restart recreates the terminal process; interrupt sends Ctrl+C; dispose closes the terminal."
+          "description": "How the Reset button handles the active terminal."
         },
-        "terminalButtons.statusBarPriority": {
+        "simpleTerminalControls.statusBarPriority": {
           "type": "number",
           "default": 10,
           "description": "Status bar priority for the CD button. Run and Stop are placed immediately to its left. Lower values move right-aligned items farther right."
         },
-        "terminalButtons.colors": {
+        "simpleTerminalControls.colors": {
           "type": "object",
           "default": {
             "run": "#00FF66",
-            "stop": "#FF3B30",
-            "cd": "#00D7FF"
+            "stop": "#b30000",
+            "cd": "#80f3ff"
           },
           "properties": {
             "run": {
@@ -154,9 +152,9 @@
             }
           },
           "additionalProperties": false,
-          "description": "Status bar foreground colors for the terminal buttons. Use CSS colors such as #00FF66."
+          "description": "Status bar foreground colors for the controls."
         },
-        "terminalButtons.pathStyle": {
+        "simpleTerminalControls.pathStyle": {
           "type": "string",
           "enum": [
             "auto",
@@ -166,20 +164,20 @@
           "default": "auto",
           "description": "How file paths are formatted before sending commands. Auto detects WSL-like Windows terminals."
         },
-        "terminalButtons.terminalName": {
+        "simpleTerminalControls.terminalName": {
           "type": "string",
-          "default": "Terminal Buttons",
-          "description": "Name for the dedicated terminal when terminalButtons.preferActiveTerminal is disabled or no terminal is active."
+          "default": "Simple Terminal Controls",
+          "description": "Name for the dedicated terminal when simpleTerminalControls.preferActiveTerminal is disabled or no terminal is active."
         },
-        "terminalButtons.tools": {
+        "simpleTerminalControls.tools": {
           "type": "object",
           "default": {},
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Override tool commands or executable paths used by built-in defaults. Keys include node, tsx, ts-node, bun, deno, python, python3, py, go, java, php, ruby, bash, sh, pwsh, and more."
+          "description": "Override tool command names used by built-in defaults."
         },
-        "terminalButtons.runCommands": {
+        "simpleTerminalControls.runCommands": {
           "type": "object",
           "default": {},
           "additionalProperties": {

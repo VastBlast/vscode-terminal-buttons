@@ -14,9 +14,9 @@ import {
 	type ShellEnvironment,
 } from './shell';
 
-const commandPrefix = 'terminal-buttons';
-const configPrefix = 'terminalButtons';
-const defaultTerminalName = 'Terminal Buttons';
+const commandPrefix = 'simple-terminal-controls';
+const configPrefix = 'simpleTerminalControls';
+const defaultTerminalName = 'Simple Terminal Controls';
 const defaultButtonColors = {
 	cd: '#00D7FF',
 	run: '#00FF66',
@@ -51,11 +51,11 @@ interface TerminalProfile {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-	const controller = new TerminalButtonsController();
+	const controller = new SimpleTerminalControlsController();
 	controller.register(context);
 }
 
-class TerminalButtonsController {
+class SimpleTerminalControlsController {
 	private managedTerminal: vscode.Terminal | undefined;
 	private readonly runtimeDetector = new RuntimeDetector();
 	private readonly statusBarItems: vscode.StatusBarItem[] = [];
@@ -118,7 +118,7 @@ class TerminalButtonsController {
 
 		if (!commandTemplate) {
 			const subject = target.isDirectory ? 'folder' : getPathParts(target.fileSystemPath).extname || 'file type';
-			void vscode.window.showWarningMessage(`No run command is configured for this ${subject}. Configure terminalButtons.runCommands to add one.`);
+			void vscode.window.showWarningMessage(`No run command is configured for this ${subject}. Configure simpleTerminalControls.runCommands to add one.`);
 			return;
 		}
 
@@ -202,7 +202,7 @@ class TerminalButtonsController {
 			this.terminalPathStyles.set(terminal, selected.pathStyle);
 		}
 
-		void vscode.window.showInformationMessage(`Terminal Buttons path mode for ${terminal.name}: ${selected.label}`);
+		void vscode.window.showInformationMessage(`Simple Terminal Controls path mode for ${terminal.name}: ${selected.label}`);
 	}
 
 	private async resolveTarget(resource?: vscode.Uri, resources?: vscode.Uri[]): Promise<Target | undefined> {
@@ -213,7 +213,7 @@ class TerminalButtonsController {
 		}
 
 		if (uri.scheme !== 'file') {
-			void vscode.window.showWarningMessage(`Terminal Buttons only supports file-system resources. Received '${uri.scheme}'.`);
+			void vscode.window.showWarningMessage(`Simple Terminal Controls only supports file-system resources. Received '${uri.scheme}'.`);
 			return undefined;
 		}
 
@@ -316,12 +316,12 @@ class TerminalButtonsController {
 
 	private createStatusBarItem(id: string, text: string, command: string, tooltip: string, priority: number, color: string): vscode.StatusBarItem {
 		const item = vscode.window.createStatusBarItem(`${commandPrefix}.status.${id}`, vscode.StatusBarAlignment.Right, priority);
-		item.name = `Terminal Buttons: ${id}`;
+		item.name = `Simple Terminal Controls: ${id}`;
 		item.text = text;
 		item.color = color;
 		item.command = command;
 		item.tooltip = tooltip;
-		item.accessibilityInformation = { label: `Terminal Buttons: ${tooltip}`, role: 'button' };
+		item.accessibilityInformation = { label: `Simple Terminal Controls: ${tooltip}`, role: 'button' };
 		item.show();
 		return item;
 	}
