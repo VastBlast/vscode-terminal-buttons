@@ -84,10 +84,6 @@
         {
           "command": "simple-terminal-controls.run",
           "group": "navigation@20"
-        },
-        {
-          "command": "simple-terminal-controls.cd",
-          "group": "navigation@21"
         }
       ],
       "terminal/title/context": [
