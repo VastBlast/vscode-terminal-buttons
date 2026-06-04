@@ -12,6 +12,7 @@ out/test/
 .gitignore
 .gitattributes
 .vscodeignore
+AGENTS.md
 eslint.config.mjs
 package-lock.json
 tsconfig.json

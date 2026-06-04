@@ -6,6 +6,7 @@ out/test/**
 .gitattributes
 .npmignore
 .yarnrc
+AGENTS.md
 package-lock.json
 vsc-extension-quickstart.md
 .vscode-test.mjs

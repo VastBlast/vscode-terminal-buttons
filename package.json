@@ -3,12 +3,30 @@
   "displayName": "Terminal Buttons",
   "description": "Small status bar buttons for running files, stopping terminal work, and changing directories.",
   "version": "0.1.0",
+  "publisher": "VastBlast",
+  "license": "MIT",
+  "homepage": "https://github.com/VastBlast/vscode-terminal-buttons#readme",
+  "bugs": {
+    "url": "https://github.com/VastBlast/vscode-terminal-buttons/issues"
+  },
   "engines": {
     "vscode": "^1.120.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VastBlast/vscode-terminal-buttons.git"
+  },
+  "keywords": [
+    "terminal",
+    "status-bar",
+    "run",
+    "wsl",
+    "typescript",
+    "tsx"
+  ],
+  "galleryBanner": {
+    "color": "#111827",
+    "theme": "dark"
   },
   "extensionKind": [
     "workspace"
@@ -177,7 +195,9 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --max-warnings=0",
-    "test": "npm run compile && npm run lint && node --test out/test/*.test.js"
+    "test": "npm run compile && npm run lint && node --test out/test/*.test.js",
+    "vsix": "npx @vscode/vsce package",
+    "publish": "npx @vscode/vsce publish"
   },
   "devDependencies": {
     "@types/node": "22.x",
