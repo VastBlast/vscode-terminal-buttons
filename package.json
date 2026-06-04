@@ -196,7 +196,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --max-warnings=0",
     "test": "npm run compile && npm run lint && node --test out/test/*.test.js",
-    "vsix": "npx @vscode/vsce package",
+    "package": "npx @vscode/vsce package",
     "publish": "npx @vscode/vsce publish"
   },
   "devDependencies": {
