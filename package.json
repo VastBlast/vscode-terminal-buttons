@@ -6,6 +6,10 @@
   "engines": {
     "vscode": "^1.120.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VastBlast/vscode-terminal-buttons.git"
+  },
   "extensionKind": [
     "workspace"
   ],
