@@ -74,60 +74,60 @@ function getDefaultCommand(target: RunCommandTarget): string | undefined {
 		case '.cjs':
 		case '.js':
 		case '.mjs':
-			return `${javascriptRuntime} \${file}`;
+			return `${javascriptRuntime} \${runFile}`;
 		case '.cts':
 		case '.mts':
 		case '.ts':
-			return `${typescriptRuntime ?? 'node'} \${file}`;
+			return `${typescriptRuntime ?? 'node'} \${runFile}`;
 		case '.tsx':
-			return typescriptRuntime ? `${typescriptRuntime} \${file}` : undefined;
+			return typescriptRuntime ? `${typescriptRuntime} \${runFile}` : undefined;
 		case '.bash':
-			return target.tools.bash ? `${target.tools.bash} \${file}` : undefined;
+			return target.tools.bash ? `${target.tools.bash} \${runFile}` : undefined;
 		case '.bat':
 		case '.cmd':
 			if (!target.isWindowsTerminal) {
 				return undefined;
 			}
 
-			return target.isPowerShell ? 'cmd /c ${file}' : '${file}';
+			return target.isPowerShell ? 'cmd /c ${runFile}' : '${runFile}';
 		case '.fish':
-			return target.tools.fish ? `${target.tools.fish} \${file}` : undefined;
+			return target.tools.fish ? `${target.tools.fish} \${runFile}` : undefined;
 		case '.go':
-			return target.tools.go ? `${target.tools.go} run \${file}` : undefined;
+			return target.tools.go ? `${target.tools.go} run \${runFile}` : undefined;
 		case '.java':
-			return target.tools.java ? `${target.tools.java} \${file}` : undefined;
+			return target.tools.java ? `${target.tools.java} \${runFile}` : undefined;
 		case '.jl':
-			return target.tools.julia ? `${target.tools.julia} \${file}` : undefined;
+			return target.tools.julia ? `${target.tools.julia} \${runFile}` : undefined;
 		case '.kts':
-			return target.tools.kotlinc ? `${target.tools.kotlinc} -script \${file}` : undefined;
+			return target.tools.kotlinc ? `${target.tools.kotlinc} -script \${runFile}` : undefined;
 		case '.lua':
-			return target.tools.lua ? `${target.tools.lua} \${file}` : undefined;
+			return target.tools.lua ? `${target.tools.lua} \${runFile}` : undefined;
 		case '.m':
-			return ['matlab', 'octave'].includes(target.languageId ?? '') && target.tools.octave ? `${target.tools.octave} \${file}` : undefined;
+			return ['matlab', 'octave'].includes(target.languageId ?? '') && target.tools.octave ? `${target.tools.octave} \${runFile}` : undefined;
 		case '.php':
-			return target.tools.php ? `${target.tools.php} \${file}` : undefined;
+			return target.tools.php ? `${target.tools.php} \${runFile}` : undefined;
 		case '.pl':
-			return target.tools.perl ? `${target.tools.perl} \${file}` : undefined;
+			return target.tools.perl ? `${target.tools.perl} \${runFile}` : undefined;
 		case '.ps1':
 			return target.isPowerShell
-				? '& ${file}'
+				? '& ${runFile}'
 				: target.tools.pwsh || target.tools.powershell
-					? `${target.tools.pwsh ?? target.tools.powershell} -File \${file}`
+					? `${target.tools.pwsh ?? target.tools.powershell} -File \${runFile}`
 					: undefined;
 		case '.py':
-			return pythonRuntime ? `${pythonRuntime} \${file}` : undefined;
+			return pythonRuntime ? `${pythonRuntime} \${runFile}` : undefined;
 		case '.r':
-			return target.tools.Rscript ? `${target.tools.Rscript} \${file}` : undefined;
+			return target.tools.Rscript ? `${target.tools.Rscript} \${runFile}` : undefined;
 		case '.rb':
-			return target.tools.ruby ? `${target.tools.ruby} \${file}` : undefined;
+			return target.tools.ruby ? `${target.tools.ruby} \${runFile}` : undefined;
 		case '.sh': {
 			const shellRuntime = target.tools.bash ?? target.tools.sh;
-			return shellRuntime ? `${shellRuntime} \${file}` : undefined;
+			return shellRuntime ? `${shellRuntime} \${runFile}` : undefined;
 		}
 		case '.swift':
-			return target.tools.swift ? `${target.tools.swift} \${file}` : undefined;
+			return target.tools.swift ? `${target.tools.swift} \${runFile}` : undefined;
 		case '.zsh':
-			return target.tools.zsh ? `${target.tools.zsh} \${file}` : undefined;
+			return target.tools.zsh ? `${target.tools.zsh} \${runFile}` : undefined;
 		default:
 			return undefined;
 	}

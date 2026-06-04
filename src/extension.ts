@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getPathParts, getRelativePath } from './paths';
+import { getContainedRelativePath, getPathParts, getRelativePath } from './paths';
 import { resolveRunCommand, type RunCommandMap } from './runCommands';
 import { RuntimeDetector } from './runtimeTools';
 import { getRestartTerminalOptions } from './terminalRestart';
@@ -122,7 +122,7 @@ class TerminalButtonsController {
 			return;
 		}
 
-		const command = expandCommandTemplate(commandTemplate, buildCommandVariables(target, shellContext));
+		const command = expandCommandTemplate(commandTemplate, buildCommandVariables(target, shellContext, getTerminalCwd(terminal.shellIntegration?.cwd, shellContext)));
 		await this.execute(terminal, command);
 	}
 
@@ -367,7 +367,7 @@ function readStringMap(config: vscode.WorkspaceConfiguration, key: string) {
 	return Object.fromEntries(Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
 }
 
-function buildCommandVariables(target: Target, shellContext: ShellContext): Record<string, string> {
+function buildCommandVariables(target: Target, shellContext: ShellContext, terminalCwd?: string): Record<string, string> {
 	const parts = getPathParts(target.fileSystemPath);
 	const workspaceFolder = target.workspaceFolder?.uri.fsPath ?? target.cwd;
 	const relativeFile = target.workspaceFolder
@@ -396,7 +396,23 @@ function buildCommandVariables(target: Target, shellContext: ShellContext): Reco
 		variables[`${name}Raw`] = terminalPath;
 	}
 
+	const runFileRaw = terminalCwd
+		? formatRelativeRunPath(getContainedRelativePath(terminalCwd, variables.fileRaw), shellContext) ?? variables.fileRaw
+		: variables.fileRaw;
+	variables.runFile = shellQuote(runFileRaw, shellContext.kind);
+	variables.runFileRaw = runFileRaw;
+
 	return variables;
+}
+
+function formatRelativeRunPath(relativePath: string | undefined, shellContext: ShellContext) {
+	if (!relativePath) {
+		return undefined;
+	}
+
+	const normalized = shellContext.kind === 'posix' ? relativePath.replaceAll('\\', '/') : relativePath;
+	const separator = normalized.includes('\\') ? '\\' : '/';
+	return normalized.startsWith(`.${separator}`) ? normalized : `.${separator}${normalized}`;
 }
 
 async function statFile(uri: vscode.Uri): Promise<vscode.FileStat | undefined> {
@@ -428,4 +444,12 @@ function getReportedTerminalCwd(cwd: vscode.Uri) {
 	}
 
 	return cwd.path;
+}
+
+function getTerminalCwd(cwd: vscode.Uri | undefined, shellContext: ShellContext) {
+	if (!cwd) {
+		return undefined;
+	}
+
+	return toTerminalPath(shellContext.pathStyle === 'wsl' ? getReportedTerminalCwd(cwd) : cwd.fsPath, shellContext);
 }

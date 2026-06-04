@@ -28,37 +28,37 @@ describe('run command resolution', () => {
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: '/workspace/src/index.js',
 			tools: { node: 'node' },
-		}), {}), 'node ${file}');
+		}), {}), 'node ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			tools: { tsx: 'tsx', node: 'node' },
-		}), {}), 'tsx ${file}');
+		}), {}), 'tsx ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			tools: { node: 'node' },
-		}), {}), 'node ${file}');
+		}), {}), 'node ${runFile}');
 	});
 
 	it('uses configured project runtimes before TypeScript runners', () => {
 		assert.equal(resolveRunCommand(target({
 			hasDenoConfig: true,
 			tools: { deno: 'deno', tsx: 'tsx', node: 'node' },
-		}), {}), 'deno run ${file}');
+		}), {}), 'deno run ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			hasBunLock: true,
 			tools: { bun: 'bun', tsx: 'tsx', node: 'node' },
-		}), {}), 'bun ${file}');
+		}), {}), 'bun ${runFile}');
 	});
 
 	it('falls back from tsx to ts-node to node for TypeScript files', () => {
 		assert.equal(resolveRunCommand(target({
 			tools: { 'ts-node': 'ts-node', node: 'node' },
-		}), {}), 'ts-node ${file}');
+		}), {}), 'ts-node ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			tools: { node: 'node' },
-		}), {}), 'node ${file}');
+		}), {}), 'node ${runFile}');
 	});
 
 	it('does not run tsx files with native Node', () => {
@@ -70,7 +70,7 @@ describe('run command resolution', () => {
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: '/workspace/src/App.tsx',
 			tools: { tsx: 'tsx', node: 'node' },
-		}), {}), 'tsx ${file}');
+		}), {}), 'tsx ${runFile}');
 	});
 
 	it('prefers exact custom commands before extension defaults', () => {
@@ -127,7 +127,7 @@ describe('run command resolution', () => {
 		}), {
 			'.ts': 123,
 			typescript: 'tsx ${file}',
-		} as unknown as RunCommandMap), 'tsx ${file}');
+		} as unknown as RunCommandMap), 'tsx ${runFile}');
 	});
 
 	it('supports common extension key forms in custom commands', () => {
@@ -174,15 +174,15 @@ describe('run command resolution', () => {
 
 	it('uses detected tools for popular single-file languages', () => {
 		const cases = [
-			['/workspace/main.go', { go: 'go' }, 'go run ${file}'],
-			['/workspace/Main.java', { java: 'java' }, 'java ${file}'],
-			['/workspace/script.kts', { kotlinc: 'kotlinc' }, 'kotlinc -script ${file}'],
-			['/workspace/script.lua', { lua: 'lua' }, 'lua ${file}'],
-			['/workspace/script.php', { php: 'php' }, 'php ${file}'],
-			['/workspace/script.pl', { perl: 'perl' }, 'perl ${file}'],
-			['/workspace/script.r', { Rscript: 'Rscript' }, 'Rscript ${file}'],
-			['/workspace/script.rb', { ruby: 'ruby' }, 'ruby ${file}'],
-			['/workspace/script.swift', { swift: 'swift' }, 'swift ${file}'],
+			['/workspace/main.go', { go: 'go' }, 'go run ${runFile}'],
+			['/workspace/Main.java', { java: 'java' }, 'java ${runFile}'],
+			['/workspace/script.kts', { kotlinc: 'kotlinc' }, 'kotlinc -script ${runFile}'],
+			['/workspace/script.lua', { lua: 'lua' }, 'lua ${runFile}'],
+			['/workspace/script.php', { php: 'php' }, 'php ${runFile}'],
+			['/workspace/script.pl', { perl: 'perl' }, 'perl ${runFile}'],
+			['/workspace/script.r', { Rscript: 'Rscript' }, 'Rscript ${runFile}'],
+			['/workspace/script.rb', { ruby: 'ruby' }, 'ruby ${runFile}'],
+			['/workspace/script.swift', { swift: 'swift' }, 'swift ${runFile}'],
 		] as const;
 
 		for (const [fileSystemPath, tools, command] of cases) {
@@ -201,28 +201,28 @@ describe('run command resolution', () => {
 			fileSystemPath: '/workspace/source.m',
 			languageId: 'matlab',
 			tools: { octave: 'octave' },
-		}), {}), 'octave ${file}');
+		}), {}), 'octave ${runFile}');
 	});
 
 	it('handles shell and Windows script defaults', () => {
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: '/workspace/script.sh',
 			tools: { bash: 'bash' },
-		}), {}), 'bash ${file}');
+		}), {}), 'bash ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: 'C:\\workspace\\script.cmd',
 			isPowerShell: true,
 			isWindowsTerminal: true,
 			tools: { cmd: 'cmd' },
-		}), {}), 'cmd /c ${file}');
+		}), {}), 'cmd /c ${runFile}');
 
 		assert.equal(resolveRunCommand(target({
 			fileSystemPath: 'C:\\workspace\\script.cmd',
 			isPowerShell: false,
 			isWindowsTerminal: true,
 			tools: { cmd: 'cmd' },
-		}), {}), '${file}');
+		}), {}), '${runFile}');
 	});
 
 	it('does not invent commands for unsupported files or missing runtimes', () => {

@@ -18,6 +18,15 @@ export function getRelativePath(from: string, to: string) {
 	return pathApi.relative(from, to) || pathApi.basename(to);
 }
 
+export function getContainedRelativePath(from: string, to: string) {
+	const pathApi = usesWindowsSeparators(from) || usesWindowsSeparators(to) ? path.win32 : path.posix;
+	const relative = pathApi.relative(from, to);
+
+	return relative && !pathApi.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${pathApi.sep}`)
+		? relative
+		: undefined;
+}
+
 export function getPathApi(fileSystemPath: string) {
 	return usesWindowsSeparators(fileSystemPath) ? path.win32 : path.posix;
 }

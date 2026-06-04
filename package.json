@@ -163,7 +163,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Custom run commands keyed by basename, extension, *.extension, extension without the dot, language id, folder, or default. Templates support ${file}, ${fileRaw}, ${fileDirname}, ${folder}, ${workspaceFolder}, ${relativeFile}, ${fileBasename}, ${fileBasenameNoExtension}, and raw variants."
+          "description": "Custom run commands keyed by basename, extension, *.extension, extension without the dot, language id, folder, or default. Templates support ${file}, ${runFile}, ${fileRaw}, ${fileDirname}, ${folder}, ${workspaceFolder}, ${relativeFile}, ${fileBasename}, ${fileBasenameNoExtension}, and raw variants."
         }
       }
     }

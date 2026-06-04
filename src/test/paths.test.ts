@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { getPathParts, getRelativePath } from '../paths';
+import { getContainedRelativePath, getPathParts, getRelativePath } from '../paths';
 
 describe('path helpers', () => {
 	it('parses POSIX paths', () => {
@@ -39,5 +39,12 @@ describe('path helpers', () => {
 	it('computes relative paths for POSIX and Windows workspaces', () => {
 		assert.equal(getRelativePath('/workspace', '/workspace/src/index.ts'), 'src/index.ts');
 		assert.equal(getRelativePath('C:\\workspace', 'C:\\workspace\\src\\index.ts'), 'src\\index.ts');
+	});
+
+	it('returns contained relative paths only when the target is inside the base', () => {
+		assert.equal(getContainedRelativePath('/workspace', '/workspace/src/index.ts'), 'src/index.ts');
+		assert.equal(getContainedRelativePath('C:\\workspace', 'C:\\workspace\\src\\index.ts'), 'src\\index.ts');
+		assert.equal(getContainedRelativePath('/workspace', '/workspace-other/index.ts'), undefined);
+		assert.equal(getContainedRelativePath('/workspace', '/workspace/..file'), '..file');
 	});
 });

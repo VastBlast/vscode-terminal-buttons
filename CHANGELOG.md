@@ -5,6 +5,7 @@
 - Initial release.
 - Run, Stop, and CD status bar buttons with editor and Explorer context actions.
 - Smart single-file run commands for common runtimes and languages.
+- Safe terminal-relative paths for built-in run commands when shell integration reports a matching cwd.
 - Lazy runtime detection with project-local TypeScript runner support and WSL PATH probing.
 - Shell-aware quoting and path handling for Windows, macOS, Linux, and WSL.
 - WSL auto-detection with a per-terminal path mode override for nested shells.

@@ -38,11 +38,11 @@ Set `terminalButtons.runCommands` in user or workspace settings. Keys can be a b
 
 Template variables:
 
-- `${file}`, `${fileDirname}`, `${folder}`, `${workspaceFolder}`, `${relativeFile}`
+- `${file}`, `${runFile}`, `${fileDirname}`, `${folder}`, `${workspaceFolder}`, `${relativeFile}`
 - `${fileBasename}`, `${fileBasenameNoExtension}`, `${fileExtname}`
 - Raw variants such as `${fileRaw}` are unquoted; non-raw path variables are shell-quoted.
 
-`${relativeFile}` is relative to the workspace folder, not the terminal's current directory.
+`${file}` is always the full path. `${runFile}` is relative to the terminal's current directory when VS Code shell integration reports the cwd and the target is inside it; otherwise it is the full path. `${relativeFile}` is relative to the workspace folder, not the terminal's current directory.
 
 ## Settings
 
