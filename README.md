@@ -1,71 +1,80 @@
-# terminal-buttons README
+# Terminal Buttons
 
-This is the README for your extension "terminal-buttons". After writing up a brief description, we recommend including the following sections.
+Three small VS Code buttons for terminal work:
 
-## Features
+- `Run`: run the active editor file or selected Explorer file.
+- `Stop`: restart the active terminal process, or create a fresh empty terminal if none exists.
+- `CD`: change the terminal directory to the active file's folder or selected folder.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Run and CD are also available from editor and Explorer context menus. The extension intentionally does not include rerun, clear, cmd, package tree, install, or kill-port features.
+Run does not change the terminal directory; use CD when you want to move the terminal first.
+Run uses VS Code shell integration when available. Without shell integration, VS Code does not expose the terminal's typed input buffer, so Run sends the command directly without first clearing or interrupting the terminal.
 
-For example if there is an image subfolder under your extension project workspace:
+## Running Files
 
-\!\[feature X\]\(images/feature-x.png\)
+Built-in run commands are single-file oriented and only use runtimes that are detected or configured, except JavaScript/TypeScript fallbacks noted below.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- JavaScript: Deno project, Bun project, then Node.
+- TypeScript: Deno project, Bun project, local or PATH `tsx`, local or PATH `ts-node`, then native Node for `.ts`, `.mts`, and `.cts`.
+- `.tsx`: Deno, Bun, `tsx`, or `ts-node`; native Node is not used because Node does not support `.tsx`.
+- Other supported single-file runtimes: Python, Go, Java source files, Kotlin scripts, Lua, PHP, Perl, PowerShell, R, Ruby, shell scripts, Swift, Julia, and MATLAB/Octave when the matching runtime is found.
 
-## Requirements
+Runtime detection is lazy. Nothing is probed at startup; PATH lookups are cached, and project files such as `bun.lock`, `deno.json`, and local `node_modules/.bin` runners are checked on Run.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Custom Commands
 
-## Extension Settings
+Set `terminalButtons.runCommands` in user or workspace settings. Keys can be a basename, extension, `*.extension`, extension without the dot, VS Code language id, `folder`, or `default`.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+```json
+{
+  "terminalButtons.runCommands": {
+    "vitest.config.ts": "vitest --config ${file}",
+    ".ts": "tsx --env-file=.env ${file}",
+    "py": "uv run ${file}",
+    "folder": "npm test"
+  }
+}
+```
 
-For example:
+Template variables:
 
-This extension contributes the following settings:
+- `${file}`, `${fileDirname}`, `${folder}`, `${workspaceFolder}`, `${relativeFile}`
+- `${fileBasename}`, `${fileBasenameNoExtension}`, `${fileExtname}`
+- Raw variants such as `${fileRaw}` are unquoted; non-raw path variables are shell-quoted.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+`${relativeFile}` is relative to the workspace folder, not the terminal's current directory.
 
-## Known Issues
+## Settings
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- `terminalButtons.preferActiveTerminal`: use the active terminal when available. Default: `true`.
+- `terminalButtons.stopBehavior`: `restart`, `interrupt`, or `dispose`. Default: `restart`.
+- `terminalButtons.statusBarPriority`: status bar priority for the button group. Default: `10`; lower values place right-aligned items farther right.
+- `terminalButtons.colors`: status bar foreground colors for `run`, `stop`, and `cd`.
+- `terminalButtons.pathStyle`: `auto`, `native`, or `wsl`. Default: `auto`.
+- `terminalButtons.enableDefaultRunCommands`: enable built-in run defaults. Default: `true`.
+- `terminalButtons.autoDetectRuntimes`: enable lazy PATH runtime detection. Default: `true`.
+- `terminalButtons.terminalName`: dedicated terminal name. Default: `Terminal Buttons`.
+- `terminalButtons.tools`: override detected runtime commands or executable paths.
 
-## Release Notes
+Example tool overrides:
 
-Users appreciate release notes as you update your extension.
+```json
+{
+  "terminalButtons.colors": {
+    "run": "#00FF66",
+    "stop": "#FF3B30",
+    "cd": "#00D7FF"
+  },
+  "terminalButtons.tools": {
+    "tsx": "pnpm exec tsx",
+    "python": "uv run python",
+    "pwsh": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+  }
+}
+```
 
-### 1.0.0
+## WSL
 
-Initial release of ...
+Remote WSL paths are already Linux paths and are left unchanged. In local Windows sessions, `pathStyle: auto` uses VS Code's detected terminal shell, shell-integration cwd, and WSL-like profiles to convert paths such as `C:\Users\me\project` to `/mnt/c/Users/me/project`.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+If a terminal was launched as `cmd` or PowerShell and then entered WSL by running `wsl`, auto mode works when VS Code reports the live terminal shell as `wsl`. If VS Code still reports the original shell, run `Terminal Buttons: Set Active Terminal Path Mode` and choose `WSL` for that terminal. Choose `Auto` to return to normal detection.

@@ -1,40 +1,185 @@
 {
   "name": "terminal-buttons",
   "displayName": "Terminal Buttons",
-  "description": "",
-  "version": "0.0.1",
+  "description": "Small status bar buttons for running files, stopping terminal work, and changing directories.",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.120.0"
   },
+  "extensionKind": [
+    "workspace"
+  ],
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "terminal-buttons.helloWorld",
-        "title": "Hello World"
+        "command": "terminal-buttons.run",
+        "title": "Terminal Buttons: Run",
+        "icon": "$(play)"
+      },
+      {
+        "command": "terminal-buttons.stop",
+        "title": "Terminal Buttons: Stop",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "terminal-buttons.cd",
+        "title": "Terminal Buttons: Change Directory",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "terminal-buttons.setTerminalPathStyle",
+        "title": "Terminal Buttons: Set Active Terminal Path Mode",
+        "icon": "$(settings-gear)"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "terminal-buttons.run",
+          "group": "terminalButtons@1"
+        },
+        {
+          "command": "terminal-buttons.cd",
+          "group": "terminalButtons@2"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "terminal-buttons.run",
+          "group": "navigation@20"
+        },
+        {
+          "command": "terminal-buttons.cd",
+          "group": "navigation@21"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "terminal-buttons.run",
+          "group": "navigation@20"
+        },
+        {
+          "command": "terminal-buttons.cd",
+          "group": "navigation@21"
+        }
+      ],
+      "terminal/title/context": [
+        {
+          "command": "terminal-buttons.setTerminalPathStyle",
+          "group": "terminalButtons@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Terminal Buttons",
+      "properties": {
+        "terminalButtons.preferActiveTerminal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use the active terminal when one exists. When disabled, commands use a dedicated Terminal Buttons terminal."
+        },
+        "terminalButtons.enableDefaultRunCommands": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable built-in single-file run commands. Disable this when you want terminalButtons.runCommands to be the only source of run behavior."
+        },
+        "terminalButtons.autoDetectRuntimes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect relevant runtime commands lazily and cache the result. Project-local TypeScript runners are checked before PATH commands."
+        },
+        "terminalButtons.stopBehavior": {
+          "type": "string",
+          "enum": [
+            "restart",
+            "interrupt",
+            "dispose"
+          ],
+          "default": "restart",
+          "description": "How the Stop button stops terminal work. Restart recreates the terminal process; interrupt sends Ctrl+C; dispose closes the terminal."
+        },
+        "terminalButtons.statusBarPriority": {
+          "type": "number",
+          "default": 10,
+          "description": "Status bar priority for the CD button. Run and Stop are placed immediately to its left. Lower values move right-aligned items farther right."
+        },
+        "terminalButtons.colors": {
+          "type": "object",
+          "default": {
+            "run": "#00FF66",
+            "stop": "#FF3B30",
+            "cd": "#00D7FF"
+          },
+          "properties": {
+            "run": {
+              "type": "string",
+              "description": "Status bar foreground color for Run."
+            },
+            "stop": {
+              "type": "string",
+              "description": "Status bar foreground color for Stop."
+            },
+            "cd": {
+              "type": "string",
+              "description": "Status bar foreground color for CD."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Status bar foreground colors for the terminal buttons. Use CSS colors such as #00FF66."
+        },
+        "terminalButtons.pathStyle": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "native",
+            "wsl"
+          ],
+          "default": "auto",
+          "description": "How file paths are formatted before sending commands. Auto detects WSL-like Windows terminals."
+        },
+        "terminalButtons.terminalName": {
+          "type": "string",
+          "default": "Terminal Buttons",
+          "description": "Name for the dedicated terminal when terminalButtons.preferActiveTerminal is disabled or no terminal is active."
+        },
+        "terminalButtons.tools": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Override tool commands or executable paths used by built-in defaults. Keys include node, tsx, ts-node, bun, deno, python, python3, py, go, java, php, ruby, bash, sh, pwsh, and more."
+        },
+        "terminalButtons.runCommands": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom run commands keyed by basename, extension, *.extension, extension without the dot, language id, folder, or default. Templates support ${file}, ${fileRaw}, ${fileDirname}, ${folder}, ${workspaceFolder}, ${relativeFile}, ${fileBasename}, ${fileBasenameNoExtension}, and raw variants."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "lint": "eslint src --max-warnings=0",
+    "test": "npm run compile && npm run lint && node --test out/test/*.test.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.120.0",
-    "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "typescript-eslint": "^8.56.1",
+    "@types/vscode": "^1.120.0",
     "eslint": "^9.39.3",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "typescript-eslint": "^8.56.1"
   }
 }
