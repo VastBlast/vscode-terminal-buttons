@@ -6,16 +6,16 @@
   "publisher": "VastBlast",
   "license": "MIT",
   "icon": "resources/icon.png",
-  "homepage": "https://github.com/VastBlast/vscode-terminal-buttons#readme",
+  "homepage": "https://github.com/VastBlast/vscode-simple-terminal-controls#readme",
   "bugs": {
-    "url": "https://github.com/VastBlast/vscode-terminal-buttons/issues"
+    "url": "https://github.com/VastBlast/vscode-simple-terminal-controls/issues"
   },
   "engines": {
     "vscode": "^1.120.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VastBlast/vscode-terminal-buttons.git"
+    "url": "git+https://github.com/VastBlast/vscode-simple-terminal-controls.git"
   },
   "keywords": [
     "terminal",
