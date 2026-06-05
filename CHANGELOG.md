@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- Fixed CD in PowerShell terminals so it uses `Set-Location -LiteralPath` instead of the `cmd.exe`-only `cd /d` form when terminal profile hints conflict.
+
 ## 0.1.0
 
 - Initial release.

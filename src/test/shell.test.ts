@@ -103,6 +103,47 @@ describe('shell helpers', () => {
 		assert.equal(getShellContext({ pathStyle: 'auto', platform: 'darwin', shellPath: '/bin/zsh' }).kind, 'posix');
 	});
 
+	it('prefers the live terminal shell over default profile data', () => {
+		const context = getShellContext({
+			defaultProfile: 'Command Prompt',
+			pathStyle: 'auto',
+			platform: 'win32',
+			terminalStateShell: 'powershell',
+		});
+
+		assert.equal(context.kind, 'powershell');
+		assert.equal(
+			cdCommand('C:\\Users\\Me\\My Project', context),
+			"Set-Location -LiteralPath 'C:\\Users\\Me\\My Project'",
+		);
+	});
+
+	it('does not let a WSL default profile override a live PowerShell terminal', () => {
+		const context = getShellContext({
+			defaultProfile: 'Ubuntu',
+			pathStyle: 'auto',
+			platform: 'win32',
+			profileSource: 'WSL',
+			terminalStateShell: 'pwsh',
+		});
+
+		assert.equal(context.isWsl, false);
+		assert.equal(context.kind, 'powershell');
+	});
+
+	it('does not let a WSL default profile override a named native terminal', () => {
+		const context = getShellContext({
+			defaultProfile: 'Ubuntu',
+			pathStyle: 'auto',
+			platform: 'win32',
+			profileSource: 'WSL',
+			terminalName: 'Git Bash',
+		});
+
+		assert.equal(context.isWsl, false);
+		assert.equal(context.kind, 'posix');
+	});
+
 	it('quotes cd commands for PowerShell, POSIX, and cmd shells', () => {
 		assert.equal(
 			cdCommand('C:\\Users\\Me\\My Project', getShellContext({ pathStyle: 'native', platform: 'win32', shellPath: 'pwsh.exe' })),

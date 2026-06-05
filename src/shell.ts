@@ -16,6 +16,7 @@ export interface ShellEnvironment {
 }
 
 export interface ShellContext {
+	hostPlatform: NodeJS.Platform;
 	isWsl: boolean;
 	kind: ShellKind;
 	pathStyle: Exclude<PathStyle, 'auto'>;
@@ -23,26 +24,30 @@ export interface ShellContext {
 }
 
 export function getShellContext(environment: ShellEnvironment): ShellContext {
-	const identity = [
-		environment.terminalName,
+	const identities = [
+		environment.terminalStateShell,
 		environment.shellPath,
 		formatShellArgs(environment.shellArgs),
-		environment.defaultProfile,
+		environment.terminalName,
 		environment.profileShellPath,
 		environment.profileSource,
-		environment.terminalStateShell,
-	].filter(Boolean).join(' ').toLowerCase();
+		environment.defaultProfile,
+	].map(normalizeIdentity);
+	const detectedShell = findDetectedShell(identities);
+	const wslIdentityIndex = identities.findIndex(looksLikeWsl);
 
 	const isRemoteWsl = environment.remoteName?.toLowerCase() === 'wsl';
 	const isLocalWindows = environment.platform === 'win32' && !isRemoteWsl;
 	const isWsl = environment.pathStyle === 'wsl'
 		|| (environment.pathStyle === 'auto' && isLocalWindows && (
-			looksLikeWsl(identity) || looksLikeWslPath(environment.currentWorkingDirectory)
+			looksLikeWslPath(environment.currentWorkingDirectory)
+			|| isWslShell(wslIdentityIndex, detectedShell)
 		));
 
-	const kind = detectShellKind(identity, environment.platform, isWsl);
+	const kind = detectShellKind(detectedShell, environment.platform, isWsl);
 
 	return {
+		hostPlatform: environment.platform,
 		isWsl,
 		kind,
 		pathStyle: isWsl ? 'wsl' : 'native',
@@ -99,11 +104,31 @@ export function expandCommandTemplate(template: string, variables: Record<string
 	return template.replace(/\$\{([a-zA-Z][\w]*)\}/g, (token, name: string) => variables[name] ?? token);
 }
 
-function detectShellKind(identity: string, platform: NodeJS.Platform, isWsl: boolean): ShellKind {
+interface DetectedShell {
+	kind: ShellKind;
+	sourceIndex: number;
+}
+
+function detectShellKind(detectedShell: DetectedShell | undefined, platform: NodeJS.Platform, isWsl: boolean): ShellKind {
 	if (isWsl) {
 		return 'posix';
 	}
 
+	return detectedShell?.kind ?? (platform === 'win32' ? 'powershell' : 'posix');
+}
+
+function findDetectedShell(identities: string[]): DetectedShell | undefined {
+	for (const [sourceIndex, identity] of identities.entries()) {
+		const kind = detectShellKindFromIdentity(identity);
+		if (kind) {
+			return { kind, sourceIndex };
+		}
+	}
+
+	return undefined;
+}
+
+function detectShellKindFromIdentity(identity: string): ShellKind | undefined {
 	if (/\b(cmd|cmd\.exe|command prompt)\b/.test(identity)) {
 		return 'cmd';
 	}
@@ -116,7 +141,17 @@ function detectShellKind(identity: string, platform: NodeJS.Platform, isWsl: boo
 		return 'posix';
 	}
 
-	return platform === 'win32' ? 'powershell' : 'posix';
+	return undefined;
+}
+
+function isWslShell(wslIdentityIndex: number, detectedShell: DetectedShell | undefined) {
+	if (wslIdentityIndex === -1) {
+		return false;
+	}
+
+	return !detectedShell
+		|| wslIdentityIndex <= detectedShell.sourceIndex
+		|| (detectedShell.sourceIndex === 0 && detectedShell.kind === 'posix');
 }
 
 function looksLikeWsl(identity: string) {
@@ -178,6 +213,14 @@ function isWindowsPath(fileSystemPath: string) {
 	return /^[a-z]:[\\/]/i.test(fileSystemPath) || fileSystemPath.startsWith('\\\\');
 }
 
-function formatShellArgs(shellArgs: readonly string[] | string | undefined) {
-	return Array.isArray(shellArgs) ? shellArgs.join(' ') : shellArgs;
+function formatShellArgs(shellArgs: readonly string[] | string | undefined): string | undefined {
+	if (typeof shellArgs === 'string' || shellArgs === undefined) {
+		return shellArgs;
+	}
+
+	return shellArgs.join(' ');
+}
+
+function normalizeIdentity(identity: string | undefined) {
+	return identity?.toLowerCase().trim() ?? '';
 }

@@ -132,7 +132,7 @@ export class RuntimeDetector {
 	private commandExists(tool: ToolName, shellContext: ShellContext) {
 		const cacheKey = [
 			'cmd',
-			process.platform,
+			shellContext.hostPlatform,
 			shellContext.isWsl ? `wsl:${shellContext.wslDistro ?? ''}` : process.env.PATH ?? '',
 			tool,
 		].join(':');
@@ -147,7 +147,7 @@ export class RuntimeDetector {
 
 	private async commandExistsUncached(tool: ToolName, shellContext: ShellContext) {
 		try {
-			if (process.platform === 'win32') {
+			if (shellContext.hostPlatform === 'win32') {
 				if (shellContext.isWsl) {
 					const distroArgs = shellContext.wslDistro ? ['-d', shellContext.wslDistro] : [];
 					await this.commandProbe('wsl.exe', [...distroArgs, 'sh', '-lc', `command -v ${tool}`], { windowsHide: true, timeout: 1500 });
